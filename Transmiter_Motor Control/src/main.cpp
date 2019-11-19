@@ -22,7 +22,10 @@
 
 #define CE_PIN   9
 #define CSN_PIN 10
-// #define Sensor 8
+#define SensorPin1 8
+#define SensorPin2 7
+#define SensorPin3 6
+#define SensorPin4 5
 const byte slaveAddress[5] = {'N','O','D','E','1'};
 
 RF24 radio(CE_PIN, CSN_PIN); // Create a Radio from RF24
@@ -36,29 +39,37 @@ unsigned long txIntervalMillis = 3000; // !!!!!send once per 3 second (Adjust ac
 //=============== Sensor Function ==================>>>>>>
 char WaterLevel()
 {
-  int level=9;    //this level will be taken by using water level SENSOR (here Im giving manually to check)
-  if(level>=8)
+    int level0= digitalRead(SensorPin1);
+    int level1= digitalRead(SensorPin2);
+    int level2= digitalRead(SensorPin3);
+    int level3= digitalRead(SensorPin4);
+     
+  if(level3 == HIGH && level2 == HIGH && level1 == HIGH && level0 == HIGH)
   {
-    return 48;  //  ascii equivalent of 0 is 48 and of 1 is 49
+    Serial.println("Tank is Completely Filled !!");
+    return 51;      // [3] ascii equivalent of 0 is 48 and of 1 is 49
   }
-  else if(level <=3)
+  else if(level2 == HIGH && level1 == HIGH && level0 == HIGH)
   {
-    return 49;      //motor ON for motorOnTime
+    Serial.println("Tank is filled upto level 3 ");
+    return 50;      // [2] motor ON for motorOnTime
   }
+  else if(level1 == HIGH && level0 == HIGH)
+  {
+    Serial.println("Tank is filled upto level 2 ");
+    return 49;      // [1] motor ON for motorOnTime
+  }
+  else if(level0 == HIGH)
+  {
+    Serial.println("Tank is Empty, Start the Motor...");
+    return 48;      // [0] motor ON for motorOnTime
+  }
+
 }
 //<<<<<<<<<=================================================
 
 char dataToSend= {(WaterLevel())};
 
-void updateMessage() 
-{
-    // so you can see that new data is being sent
-    txNum += 1;
-    if (txNum > '9') {
-        txNum = '0';
-    }
-    dataToSend = txNum;
-}
 
 
 //=============== Function for : Data to be sent  ==================>>>>>>
@@ -74,7 +85,6 @@ void send()
     if (rslt) 
     {
         Serial.println("  Acknowledge received");
-        updateMessage();
     }
     else 
     {
@@ -91,7 +101,10 @@ void setup()
     Serial.begin(9600);
     Serial.println("SimpleTx Starting");
 
-    //pinMode(Sensor, INPUT);    //Uncomment it when sensor is connected
+    pinMode(SensorPin1, INPUT);
+    pinMode(SensorPin2, INPUT);
+    pinMode(SensorPin3, INPUT);
+    pinMode(SensorPin4, INPUT);
 
     radio.begin();
     radio.setDataRate( RF24_250KBPS );

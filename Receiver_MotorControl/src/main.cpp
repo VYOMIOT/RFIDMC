@@ -21,6 +21,10 @@
 #define CE_PIN   9
 #define CSN_PIN 10
 #define Relay 8
+#define LevelLed_3 7
+#define LevelLed_2 6
+#define LevelLed_1 5
+#define LevelLed_0 4
 #define motorOnTime 10000    //for now it is in milli seconds
 
 const byte thisSlaveAddress[5] = {'N','O','D','E','1'};
@@ -45,23 +49,37 @@ void MotorOnOff()
 {
   
   char x= dataReceived;
-  //x=0 => tank is filled...
-  if(x== '0' )          
+  
+  if(x == '3')          
   { 
     Serial.println(" TANK IS FILLED ALREADY!!! "); 
-    digitalWrite(Relay, LOW);    
+    digitalWrite(Relay, LOW); 
+    digitalWrite(LevelLed_3, HIGH);   
   }
-  // x=1 => Tank is empty...
-  else if(x == '1' )    
+  else if(x == '2')          
+  { 
+    Serial.println(" TANK IS at level 2 "); 
+    digitalWrite(Relay, LOW); 
+    digitalWrite(LevelLed_2, HIGH);   
+  }
+  else if(x== '1' )          
+  { 
+    Serial.println(" TANK IS at level 1 "); 
+    digitalWrite(Relay, LOW); 
+    digitalWrite(LevelLed_1, HIGH);   
+  }
+
+  else if(x == '0' )    
   {
     Serial.println(" STARTING THE MOTOR NOW ====>");
     digitalWrite(Relay, HIGH);
-    delay(motorOnTime);              //IF some better alternative for this delay could be implemented?
+    delay(motorOnTime);              
     digitalWrite(Relay, LOW);   
     Serial.println(" MOTOR IS TURNED OFF!!! ");
   }
 }
 //<<<<<<<<*********************************************************************************************************************************//
+
 
 void showData()
 {
@@ -75,7 +93,6 @@ void showData()
 
 void setup() 
 {
-
     Serial.begin(9600);
     pinMode(Relay, OUTPUT);
     digitalWrite(Relay, LOW);    //First, keep the motor in OFF state
@@ -93,8 +110,7 @@ void loop()
 {
     getData();
     showData();
-    MotorOnOff();
-   
+    MotorOnOff();  
 }
 
 //<<<<<===================================================================================================================
