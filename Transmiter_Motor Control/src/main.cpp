@@ -9,7 +9,7 @@
   
   
   
-   By: Pankaj Rai
+   By: Pankaj Rai (pankaj200497@gmail.com)
    Date: 13 November 2019
  */
 
@@ -41,7 +41,7 @@ unsigned long txIntervalMillis = 3000; // !!!!!send once per 3 second (Adjust ac
 //=============== Sensor Function ==================>>>>>>
 char WaterLevel()
 {
-    int level0= digitalRead(SensorPin1);  // 0%  Water Level
+    int level0= digitalRead(SensorPin0);  // 0%  Water Level
     int level1= digitalRead(SensorPin1);  // 25% Water Level
     int level2= digitalRead(SensorPin2);  // 50% water Level
     int level3= digitalRead(SensorPin3);  // 75% Water Level
