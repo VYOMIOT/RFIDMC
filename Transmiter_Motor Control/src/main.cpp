@@ -22,10 +22,12 @@
 
 #define CE_PIN   9
 #define CSN_PIN 10
-#define SensorPin1 8
-#define SensorPin2 7
-#define SensorPin3 6
-#define SensorPin4 5
+#define SensorPin0 8
+#define SensorPin1 7
+#define SensorPin2 6
+#define SensorPin3 5
+#define SensorPin4 4
+
 const byte slaveAddress[5] = {'N','O','D','E','1'};
 
 RF24 radio(CE_PIN, CSN_PIN); // Create a Radio from RF24
@@ -39,30 +41,36 @@ unsigned long txIntervalMillis = 3000; // !!!!!send once per 3 second (Adjust ac
 //=============== Sensor Function ==================>>>>>>
 char WaterLevel()
 {
-    int level0= digitalRead(SensorPin1);
-    int level1= digitalRead(SensorPin2);
-    int level2= digitalRead(SensorPin3);
-    int level3= digitalRead(SensorPin4);
+    int level0= digitalRead(SensorPin1);  // 0%  Water Level
+    int level1= digitalRead(SensorPin1);  // 25% Water Level
+    int level2= digitalRead(SensorPin2);  // 50% water Level
+    int level3= digitalRead(SensorPin3);  // 75% Water Level
+    int level4= digitalRead(SensorPin4);  // 100% Water Level
      
-  if(level3 == HIGH && level2 == HIGH && level1 == HIGH && level0 == HIGH)
+  if(level4 == HIGH && level3 == HIGH && level2 == HIGH && level1 == HIGH && level0 == HIGH)
   {
     Serial.println("Tank is Completely Filled !!");
-    return 51;      // [3] ascii equivalent of 0 is 48 and of 1 is 49
+    return 52;      // [4] ascii equivalent of 0 is 48 , 100% Water Level
+  }
+  else if(level3 == HIGH && level2 == HIGH && level1 == HIGH && level0 == HIGH)
+  {
+    Serial.println("Tank is filled upto level 3 ");
+    return 51;      // [3] 
   }
   else if(level2 == HIGH && level1 == HIGH && level0 == HIGH)
   {
-    Serial.println("Tank is filled upto level 3 ");
-    return 50;      // [2] motor ON for motorOnTime
+    Serial.println("Tank is filled upto level 2 ");
+    return 50;      // [2] 
   }
   else if(level1 == HIGH && level0 == HIGH)
   {
-    Serial.println("Tank is filled upto level 2 ");
-    return 49;      // [1] motor ON for motorOnTime
+    Serial.println("Tank is Empty, Start the Motor...");
+    return 49;      // [1] 
   }
   else if(level0 == HIGH)
   {
     Serial.println("Tank is Empty, Start the Motor...");
-    return 48;      // [0] motor ON for motorOnTime
+    return 48;      // [0] motor ON for motorOnTime, 0% Water Level
   }
 
 }
@@ -101,6 +109,7 @@ void setup()
     Serial.begin(9600);
     Serial.println("SimpleTx Starting");
 
+    pinMode(SensorPin0, INPUT);
     pinMode(SensorPin1, INPUT);
     pinMode(SensorPin2, INPUT);
     pinMode(SensorPin3, INPUT);

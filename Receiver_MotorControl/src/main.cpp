@@ -21,10 +21,11 @@
 #define CE_PIN   9
 #define CSN_PIN 10
 #define Relay 8
-#define LevelLed_3 7
-#define LevelLed_2 6
-#define LevelLed_1 5
-#define LevelLed_0 4
+#define LEDLevel_100 7
+#define LEDLevel_75  6
+#define LEDLevel_50  5
+#define LEDLevel_25  4
+#define LEDLevel_0   3
 #define motorOnTime 10000    //for now it is in milli seconds
 
 const byte thisSlaveAddress[5] = {'N','O','D','E','1'};
@@ -49,29 +50,34 @@ void MotorOnOff()
 {
   
   char x= dataReceived;
-  
+  if(x == '4')          
+  { 
+    Serial.println(" TANK IS FULL!!! "); 
+    digitalWrite(Relay, LOW); 
+    digitalWrite(LEDLevel_100, HIGH);   
+  }
   if(x == '3')          
   { 
-    Serial.println(" TANK IS FILLED ALREADY!!! "); 
+    Serial.println(" TANK IS at 75% Water Level "); 
     digitalWrite(Relay, LOW); 
-    digitalWrite(LevelLed_3, HIGH);   
+    digitalWrite(LEDLevel_75, HIGH);   
   }
   else if(x == '2')          
   { 
-    Serial.println(" TANK IS at level 2 "); 
+    Serial.println(" TANK IS at level 50% Water Level "); 
     digitalWrite(Relay, LOW); 
-    digitalWrite(LevelLed_2, HIGH);   
+    digitalWrite(LEDLevel_50, HIGH);   
   }
   else if(x== '1' )          
   { 
-    Serial.println(" TANK IS at level 1 "); 
+    Serial.println(" TANK IS at level 25% Water Level"); 
     digitalWrite(Relay, LOW); 
-    digitalWrite(LevelLed_1, HIGH);   
+    digitalWrite(LEDLevel_25, HIGH);   
   }
 
   else if(x == '0' )    
   {
-    Serial.println(" STARTING THE MOTOR NOW ====>");
+    Serial.println(" TANK IS at level 0% Water Level, STARTING THE MOTOR NOW ====>");
     digitalWrite(Relay, HIGH);
     delay(motorOnTime);              
     digitalWrite(Relay, LOW);   
@@ -96,6 +102,12 @@ void setup()
     Serial.begin(9600);
     pinMode(Relay, OUTPUT);
     digitalWrite(Relay, LOW);    //First, keep the motor in OFF state
+
+    pinMode(LEDLevel_0, OUTPUT);
+    pinMode(LEDLevel_25, OUTPUT);
+    pinMode(LEDLevel_50, OUTPUT);
+    pinMode(LEDLevel_75, OUTPUT);
+    pinMode(LEDLevel_100, OUTPUT);
 
     Serial.println("Rx Starting---");
     radio.begin();
